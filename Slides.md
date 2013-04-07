@@ -131,8 +131,219 @@ table
 Strings
 ---------------------------------------
 * Escaped strings
-    * `'Some\n "blah" string'`
-    * `"Some\n 'blah' string"`
+    * `'Some\n "blah" string'` don't need to escape `"`
+    * `"Some\n 'blah' string"` don't need to escape `'`
+* Literal strings
+
+    ```lua
+    local someString = [[
+    first new line is ignored
+    this is a new line but this \n is not
+    ]]
+
+    local anotherString = [=[the string does not end here]]
+    [[some text]]
+    the string ends here]=]
+    ```
+
+Tables
+--------------------------------------
+* Indexing
+
+    ```lua
+    a = t[1]        -- access array element 1
+    a = t['blah']   -- access element string key 'blah'
+    a = t.blah      -- syntactic sugar for t['blah']
+    ```
+
+* Constructors
+
+    ```lua
+    -- empty table
+    t = {}
+
+    -- simple array elements are t[1], t[2], t[3]
+    t = {"blah", 1, true}
+
+    -- simple map elements t['blah'], t['foo']
+    t = {blah = 5, foo=true}
+
+    -- Explicit keys
+    t = {['blah'] = 5, [100] = true}
+
+    -- mixed elements at t[1], t[2], t[100], t.foo t.bar
+    t = 
+    {   'alpha', 'bravo';   -- element separator either , or ;
+        foo = 5; bar=4
+        [100] = false,
+    }
+    ```
+* Insertion and deletion
+
+    ```lua 
+    t.foo = 5   -- Insert value 5 at key foo
+    t.foo = nil -- Delete key foo from table
+    ```
+
+Functions
+---------------------------------------------
+* All functions have an environment
+    * The environment is a Lua table
+    * Global write inserts into the table
+    * Global read performs table lookup
+    * Local values shadow global values
+* A Lua file is actually a function
+* Function definition
+
+    ```lua
+        function (arg1, arg2) return arg1 + arg2 end
+    ```
+
+    * Start function scope with keyword `function`
+    * Follow it with argument list `(a1, a2, ...)`
+    * End function scope with keyword `end`
+    * All statements between start and end are in function scope
+    * Optional keyword `return` returns functions result 
+* Global function assignment
+
+    ```lua
+    -- This is syntax sugar
+    function arb (arg1, arg2) return arg1 + arg2 end
+    -- for this assignment of a function to the global 'arb'
+    arb = function (arg1, arg2) return arg1 + arg2 end 
+    ```
+
+* Local function assignment
+
+    ```lua
+    -- This is syntax sugar
+    local function arb (arg1, arg2) return arg1 + arg2 end
+    -- for this assignment of a function to the local 'arb'
+    local arb = function (arg1, arg2) return arg1 + arg2 end 
+    ```
+
+Functions continued
+---------------------------------------------
+* Table function insertion
+
+    ```lua 
+    -- This is syntax sugar
+    function t.arb (arg1, arg2) return arg1 + arg2 end
+    -- for this insertion of a function into table t at key arb
+    t['arb'] = function (arg1, arg2) return arg1 + arg2 end
+    ```
+
+* Table function insertion with implicit `self`
+
+    ```lua 
+    -- This is syntax sugar
+    function t:arb (arg1, arg2) 
+        return arg1 + arg2 + self[1]
+    end
+    -- for this insertion of a function into table t at key arb
+    -- and implicit self parameter
+    t['arb'] = function (self, arg1, arg2) 
+        return arg1 + arg2 + self[1]
+    end
+    ```
+
+* Function called by applying argument list to function value
+
+    ```lua
+    local arb = function (a) return a + a end
+    local x = arb(2)    -- x is 4
+    ```
+
+* Calling function implicitly passing `self`
+
+    ```lua
+    local t = {
+        arb = function(self, a) 
+            return self.x + a 
+        end; 
+        x = 1; -- trailing delimiter is fine
+    }
+    -- This is syntax sugar for 
+    local b = t:arb(2)
+    -- this lookup of arb in t and passing it t and 2
+    local c = t.arb(t, 2)
+    ```
+
+Functions continued
+---------------------------------------------
+* Parentheses optional when calling function with literal string 
+
+    ```lua 
+    -- This is syntax sugar
+    print "blah"
+    -- for this
+    print("blah")
+    ```
+
+* Parentheses optional when calling function with table constructor
+
+    ```lua 
+    -- This is syntax sugar
+    ipairs {1,2,3,4}
+    -- for this
+    ipairs ({1,2,3,4})
+    ```
+
+* Function return types are dynamic
+
+    ```lua 
+    function arb(x)
+        if      x == 1      then   return 3,4
+        elseif  x == 'j'    then   return 'bob',8
+        elseif  x == 'm'    then   return nil,'s'
+        elseif  x == 2      then   return 4
+        else
+            -- returning nothing
+        end
+    end
+    a,b = arb(1)    -- a == 3, b == 4
+    a,b = arb('j')  -- a == 'bob', b == 8
+    a,b = arb('m')  -- a == nil, b == 's'
+    a,b = arb(2)    -- a == 4, b == nil
+    a,b = arb(3)    -- a == nil, b == nil
+    ```
+
+Functions continued 
+---------------------------------------------
+* Functions support closures
+
+    ```lua
+    local function makeCounter()
+        local count = -1            -- local variable
+        return function ()          -- return the function
+            -- capture `count` updating on each invocation
+            return count = count + 1
+        end
+    end
+    local c1 = makeCounter()
+    local _1, _2, _3 = c1(), c1(), c1() -- _1 == 0, _2 == 1, _3 == 2
+    local c2 = makeCounter()
+    _1, _2, _3 = c2(), c1(), c2()       -- _1 == 0, _2 == 4, _3 == 1
+    ```
+
+* Functions support tail call recursion
+
+    ```lua
+    function fib(n)
+        local _fib(fn2, fn1, at)
+            if at == n then 
+                return fn1 + fn2
+            else
+                return _fib(fn1, fn1 + fn2, at+1)
+            end
+        end
+        if n <= 0 then return 0
+        elseif n == 1 then return 1
+        else return _fib(0, 1, 2)
+    end
+    -- no stack overflow
+    local c = fib(10000)
+    ```
 
 Control structures
 ----------------------------------------
@@ -214,3 +425,15 @@ generic for
         a = k + v       -- executes 10 times (at end a == 10 + 9)
     end
     ```
+
+Extensibility (Meta table)
+-------------------------------------
+* Can extend tables and userdata using meta tables
+* Meta table is a plain _Lua_ table
+* Meta table bound to userdata or table using `setmetatable(t, mt)` function
+* Inserting functions at specific keys specialize behaviour
+    * Arithmetic : `__add`, `__sub` etc.
+    * Comparison : `__eq`, `__lt` and `__le`.
+    * Key lookup and new key insertion : `__index` and `__newindex`
+    * Function call (using object as a function): `__call`
+    * Finalizers : `__gc`

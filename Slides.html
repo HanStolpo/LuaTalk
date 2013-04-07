@@ -173,9 +173,172 @@ Handré Stolp
 <ul class="incremental">
 <li>Escaped strings
 <ul class="incremental">
-<li><code>'Some\n &quot;blah&quot; string'</code></li>
-<li><code>&quot;Some\n 'blah' string&quot;</code></li>
+<li><code>'Some\n &quot;blah&quot; string'</code> don't need to escape <code>&quot;</code></li>
+<li><code>&quot;Some\n 'blah' string&quot;</code> don't need to escape <code>'</code></li>
 </ul></li>
+<li><p>Literal strings</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">local</span> <span class="kw">someString</span> <span class="ot">=</span> <span class="st">[[</span>
+<span class="st">first new line is ignored</span>
+<span class="st">this is a new line but this </span><span class="ot">\n</span><span class="st"> is not</span>
+<span class="st">]]</span>
+
+<span class="st">local anotherString = [=[the string does not end here]]</span>
+<span class="st">[[some text]]</span>
+<span class="st">the string ends here]=]</span></code></pre></li>
+</ul>
+</div><div class="section slide level2" id="tables">
+<h1>Tables</h1>
+<ul class="incremental">
+<li><p>Indexing</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">a</span> <span class="ot">=</span> <span class="kw">t</span><span class="ot">[</span><span class="dv">1</span><span class="ot">]</span>        <span class="co">-- access array element 1</span>
+<span class="kw">a</span> <span class="ot">=</span> <span class="kw">t</span><span class="ot">[</span><span class="st">&#39;blah&#39;</span><span class="ot">]</span>   <span class="co">-- access element string key &#39;blah&#39;</span>
+<span class="kw">a</span> <span class="ot">=</span> <span class="kw">t</span><span class="ot">.</span><span class="kw">blah</span>      <span class="co">-- syntactic sugar for t[&#39;blah&#39;]</span></code></pre></li>
+<li><p>Constructors</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="co">-- empty table</span>
+<span class="kw">t</span> <span class="ot">=</span> <span class="ot">{}</span>
+
+<span class="co">-- simple array elements are t[1], t[2], t[3]</span>
+<span class="kw">t</span> <span class="ot">=</span> <span class="ot">{</span><span class="st">&quot;blah&quot;</span><span class="ot">,</span> <span class="dv">1</span><span class="ot">,</span> <span class="kw">true</span><span class="ot">}</span>
+
+<span class="co">-- simple map elements t[&#39;blah&#39;], t[&#39;foo&#39;]</span>
+<span class="kw">t</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">blah</span> <span class="ot">=</span> <span class="dv">5</span><span class="ot">,</span> <span class="kw">foo</span><span class="ot">=</span><span class="kw">true</span><span class="ot">}</span>
+
+<span class="co">-- Explicit keys</span>
+<span class="kw">t</span> <span class="ot">=</span> <span class="ot">{[</span><span class="st">&#39;blah&#39;</span><span class="ot">]</span> <span class="ot">=</span> <span class="dv">5</span><span class="ot">,</span> <span class="ot">[</span><span class="dv">100</span><span class="ot">]</span> <span class="ot">=</span> <span class="kw">true</span><span class="ot">}</span>
+
+<span class="co">-- mixed elements at t[1], t[2], t[100], t.foo t.bar</span>
+<span class="kw">t</span> <span class="ot">=</span> 
+<span class="ot">{</span>   <span class="st">&#39;alpha&#39;</span><span class="ot">,</span> <span class="st">&#39;bravo&#39;</span><span class="ot">;</span>   <span class="co">-- element separator either , or ;</span>
+    <span class="kw">foo</span> <span class="ot">=</span> <span class="dv">5</span><span class="ot">;</span> <span class="kw">bar</span><span class="ot">=</span><span class="dv">4</span>
+    <span class="ot">[</span><span class="dv">100</span><span class="ot">]</span> <span class="ot">=</span> <span class="kw">false</span><span class="ot">,</span>
+<span class="ot">}</span></code></pre></li>
+<li><p>Insertion and deletion</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">t</span><span class="ot">.</span><span class="kw">foo</span> <span class="ot">=</span> <span class="dv">5</span>   <span class="co">-- Insert value 5 at key foo</span>
+<span class="kw">t</span><span class="ot">.</span><span class="kw">foo</span> <span class="ot">=</span> <span class="kw">nil</span> <span class="co">-- Delete key foo from table</span></code></pre></li>
+</ul>
+</div><div class="section slide level2" id="functions">
+<h1>Functions</h1>
+<ul class="incremental">
+<li>All functions have an environment
+<ul class="incremental">
+<li>The environment is a Lua table</li>
+<li>Global write inserts into the table</li>
+<li>Global read performs table lookup</li>
+<li>Local values shadow global values</li>
+</ul></li>
+<li>A Lua file is actually a function</li>
+<li><p>Function definition</p>
+<pre class="sourceCode lua"><code class="sourceCode lua">    <span class="kw">function</span> <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="kw">end</span></code></pre>
+<ul class="incremental">
+<li>Start function scope with keyword <code>function</code></li>
+<li>Follow it with argument list <code>(a1, a2, ...)</code></li>
+<li>End function scope with keyword <code>end</code></li>
+<li>All statements between start and end are in function scope</li>
+<li>Optional keyword <code>return</code> returns functions result</li>
+</ul></li>
+<li><p>Global function assignment</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="co">-- This is syntax sugar</span>
+<span class="kw">function</span> arb <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="kw">end</span>
+<span class="co">-- for this assignment of a function to the global &#39;arb&#39;</span>
+<span class="kw">arb</span> <span class="ot">=</span> <span class="kw">function</span> <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="kw">end</span> </code></pre></li>
+<li><p>Local function assignment</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="co">-- This is syntax sugar</span>
+<span class="kw">local</span> <span class="kw">function</span> arb <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="kw">end</span>
+<span class="co">-- for this assignment of a function to the local &#39;arb&#39;</span>
+<span class="kw">local</span> <span class="kw">arb</span> <span class="ot">=</span> <span class="kw">function</span> <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="kw">end</span> </code></pre></li>
+</ul>
+</div><div class="section slide level2" id="functions-continued">
+<h1>Functions continued</h1>
+<ul class="incremental">
+<li><p>Table function insertion</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="co">-- This is syntax sugar</span>
+<span class="kw">function</span> <span class="kw">t</span><span class="ot">.</span>arb <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="kw">end</span>
+<span class="co">-- for this insertion of a function into table t at key arb</span>
+<span class="kw">t</span><span class="ot">[</span><span class="st">&#39;arb&#39;</span><span class="ot">]</span> <span class="ot">=</span> <span class="kw">function</span> <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="kw">end</span></code></pre></li>
+<li><p>Table function insertion with implicit <code>self</code></p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="co">-- This is syntax sugar</span>
+<span class="kw">function</span> <span class="kw">t</span>:arb <span class="ot">(</span><span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> 
+    <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="ot">+</span> <span class="kw">self</span><span class="ot">[</span><span class="dv">1</span><span class="ot">]</span>
+<span class="kw">end</span>
+<span class="co">-- for this insertion of a function into table t at key arb</span>
+<span class="co">-- and implicit self parameter</span>
+<span class="kw">t</span><span class="ot">[</span><span class="st">&#39;arb&#39;</span><span class="ot">]</span> <span class="ot">=</span> <span class="kw">function</span> <span class="ot">(</span><span class="kw">self</span><span class="ot">,</span> <span class="kw">arg1</span><span class="ot">,</span> <span class="kw">arg2</span><span class="ot">)</span> 
+    <span class="kw">return</span> <span class="kw">arg1</span> <span class="ot">+</span> <span class="kw">arg2</span> <span class="ot">+</span> <span class="kw">self</span><span class="ot">[</span><span class="dv">1</span><span class="ot">]</span>
+<span class="kw">end</span></code></pre></li>
+<li><p>Function called by applying argument list to function value</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">local</span> <span class="kw">arb</span> <span class="ot">=</span> <span class="kw">function</span> <span class="ot">(</span><span class="kw">a</span><span class="ot">)</span> <span class="kw">return</span> <span class="kw">a</span> <span class="ot">+</span> <span class="kw">a</span> <span class="kw">end</span>
+<span class="kw">local</span> <span class="kw">x</span> <span class="ot">=</span> arb<span class="ot">(</span><span class="dv">2</span><span class="ot">)</span>    <span class="co">-- x is 4</span></code></pre></li>
+<li><p>Calling function implicitly passing <code>self</code></p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">local</span> <span class="kw">t</span> <span class="ot">=</span> <span class="ot">{</span>
+    <span class="kw">arb</span> <span class="ot">=</span> <span class="kw">function</span><span class="ot">(</span><span class="kw">self</span><span class="ot">,</span> <span class="kw">a</span><span class="ot">)</span> 
+        <span class="kw">return</span> <span class="kw">self</span><span class="ot">.</span><span class="kw">x</span> <span class="ot">+</span> <span class="kw">a</span> 
+    <span class="kw">end</span><span class="ot">;</span> 
+    <span class="kw">x</span> <span class="ot">=</span> <span class="dv">1</span><span class="ot">;</span> <span class="co">-- trailing delimiter is fine</span>
+<span class="ot">}</span>
+<span class="co">-- This is syntax sugar for </span>
+<span class="kw">local</span> <span class="kw">b</span> <span class="ot">=</span> <span class="kw">t</span>:arb<span class="ot">(</span><span class="dv">2</span><span class="ot">)</span>
+<span class="co">-- this lookup of arb in t and passing it t and 2</span>
+<span class="kw">local</span> <span class="kw">c</span> <span class="ot">=</span> <span class="kw">t</span><span class="ot">.</span>arb<span class="ot">(</span><span class="kw">t</span><span class="ot">,</span> <span class="dv">2</span><span class="ot">)</span></code></pre></li>
+</ul>
+</div><div class="section slide level2" id="functions-continued-1">
+<h1>Functions continued</h1>
+<ul class="incremental">
+<li><p>Parentheses optional when calling function with literal string</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="co">-- This is syntax sugar</span>
+<span class="fu">print</span> <span class="st">&quot;blah&quot;</span>
+<span class="co">-- for this</span>
+<span class="fu">print</span><span class="ot">(</span><span class="st">&quot;blah&quot;</span><span class="ot">)</span></code></pre></li>
+<li><p>Parentheses optional when calling function with table constructor</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="co">-- This is syntax sugar</span>
+<span class="fu">ipairs</span> <span class="ot">{</span><span class="dv">1</span><span class="ot">,</span><span class="dv">2</span><span class="ot">,</span><span class="dv">3</span><span class="ot">,</span><span class="dv">4</span><span class="ot">}</span>
+<span class="co">-- for this</span>
+<span class="fu">ipairs</span> <span class="ot">({</span><span class="dv">1</span><span class="ot">,</span><span class="dv">2</span><span class="ot">,</span><span class="dv">3</span><span class="ot">,</span><span class="dv">4</span><span class="ot">})</span></code></pre></li>
+<li><p>Function return types are dynamic</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">function</span> arb<span class="ot">(</span><span class="kw">x</span><span class="ot">)</span>
+    <span class="kw">if</span>      <span class="kw">x</span> <span class="ot">==</span> <span class="dv">1</span>      <span class="kw">then</span>   <span class="kw">return</span> <span class="dv">3</span><span class="ot">,</span><span class="dv">4</span>
+    <span class="kw">elseif</span>  <span class="kw">x</span> <span class="ot">==</span> <span class="st">&#39;j&#39;</span>    <span class="kw">then</span>   <span class="kw">return</span> <span class="st">&#39;bob&#39;</span><span class="ot">,</span><span class="dv">8</span>
+    <span class="kw">elseif</span>  <span class="kw">x</span> <span class="ot">==</span> <span class="st">&#39;m&#39;</span>    <span class="kw">then</span>   <span class="kw">return</span> <span class="kw">nil</span><span class="ot">,</span><span class="st">&#39;s&#39;</span>
+    <span class="kw">elseif</span>  <span class="kw">x</span> <span class="ot">==</span> <span class="dv">2</span>      <span class="kw">then</span>   <span class="kw">return</span> <span class="dv">4</span>
+    <span class="kw">else</span>
+        <span class="co">-- returning nothing</span>
+    <span class="kw">end</span>
+<span class="kw">end</span>
+<span class="kw">a</span><span class="ot">,</span><span class="kw">b</span> <span class="ot">=</span> arb<span class="ot">(</span><span class="dv">1</span><span class="ot">)</span>    <span class="co">-- a == 3, b == 4</span>
+<span class="kw">a</span><span class="ot">,</span><span class="kw">b</span> <span class="ot">=</span> arb<span class="ot">(</span><span class="st">&#39;j&#39;</span><span class="ot">)</span>  <span class="co">-- a == &#39;bob&#39;, b == 8</span>
+<span class="kw">a</span><span class="ot">,</span><span class="kw">b</span> <span class="ot">=</span> arb<span class="ot">(</span><span class="st">&#39;m&#39;</span><span class="ot">)</span>  <span class="co">-- a == nil, b == &#39;s&#39;</span>
+<span class="kw">a</span><span class="ot">,</span><span class="kw">b</span> <span class="ot">=</span> arb<span class="ot">(</span><span class="dv">2</span><span class="ot">)</span>    <span class="co">-- a == 4, b == nil</span>
+<span class="kw">a</span><span class="ot">,</span><span class="kw">b</span> <span class="ot">=</span> arb<span class="ot">(</span><span class="dv">3</span><span class="ot">)</span>    <span class="co">-- a == nil, b == nil</span></code></pre></li>
+</ul>
+</div><div class="section slide level2" id="functions-continued-2">
+<h1>Functions continued</h1>
+<ul class="incremental">
+<li><p>Functions support closures</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">local</span> <span class="kw">function</span> makeCounter<span class="ot">()</span>
+    <span class="kw">local</span> <span class="kw">count</span> <span class="ot">=</span> <span class="ot">-</span><span class="dv">1</span>            <span class="co">-- local variable</span>
+    <span class="kw">return</span> <span class="kw">function</span> <span class="ot">()</span>          <span class="co">-- return the function</span>
+        <span class="co">-- capture `count` updating on each invocation</span>
+        <span class="kw">return</span> <span class="kw">count</span> <span class="ot">=</span> <span class="kw">count</span> <span class="ot">+</span> <span class="dv">1</span>
+    <span class="kw">end</span>
+<span class="kw">end</span>
+<span class="kw">local</span> <span class="kw">c1</span> <span class="ot">=</span> makeCounter<span class="ot">()</span>
+<span class="kw">local</span> <span class="kw">_1</span><span class="ot">,</span> <span class="kw">_2</span><span class="ot">,</span> <span class="kw">_3</span> <span class="ot">=</span> c1<span class="ot">(),</span> c1<span class="ot">(),</span> c1<span class="ot">()</span> <span class="co">-- _1 == 0, _2 == 1, _3 == 2</span>
+<span class="kw">local</span> <span class="kw">c2</span> <span class="ot">=</span> makeCounter<span class="ot">()</span>
+<span class="kw">_1</span><span class="ot">,</span> <span class="kw">_2</span><span class="ot">,</span> <span class="kw">_3</span> <span class="ot">=</span> c2<span class="ot">(),</span> c1<span class="ot">(),</span> c2<span class="ot">()</span>       <span class="co">-- _1 == 0, _2 == 4, _3 == 1</span></code></pre></li>
+<li><p>Functions support tail call recursion</p>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">function</span> fib<span class="ot">(</span><span class="kw">n</span><span class="ot">)</span>
+    <span class="kw">local</span> _fib<span class="ot">(</span><span class="kw">fn2</span><span class="ot">,</span> <span class="kw">fn1</span><span class="ot">,</span> <span class="kw">at</span><span class="ot">)</span>
+        <span class="kw">if</span> <span class="kw">at</span> <span class="ot">==</span> <span class="kw">n</span> <span class="kw">then</span> 
+            <span class="kw">return</span> <span class="kw">fn1</span> <span class="ot">+</span> <span class="kw">fn2</span>
+        <span class="kw">else</span>
+            <span class="kw">return</span> _fib<span class="ot">(</span><span class="kw">fn1</span><span class="ot">,</span> <span class="kw">fn1</span> <span class="ot">+</span> <span class="kw">fn2</span><span class="ot">,</span> <span class="kw">at</span><span class="ot">+</span><span class="dv">1</span><span class="ot">)</span>
+        <span class="kw">end</span>
+    <span class="kw">end</span>
+    <span class="kw">if</span> <span class="kw">n</span> <span class="ot">&lt;=</span> <span class="dv">0</span> <span class="kw">then</span> <span class="kw">return</span> <span class="dv">0</span>
+    <span class="kw">elseif</span> <span class="kw">n</span> <span class="ot">==</span> <span class="dv">1</span> <span class="kw">then</span> <span class="kw">return</span> <span class="dv">1</span>
+    <span class="kw">else</span> <span class="kw">return</span> _fib<span class="ot">(</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">1</span><span class="ot">,</span> <span class="dv">2</span><span class="ot">)</span>
+<span class="kw">end</span>
+<span class="co">-- no stack overflow</span>
+<span class="kw">local</span> <span class="kw">c</span> <span class="ot">=</span> fib<span class="ot">(</span><span class="dv">10000</span><span class="ot">)</span></code></pre></li>
 </ul>
 </div><div class="section slide level2" id="control-structures">
 <h1>Control structures</h1>
@@ -244,6 +407,21 @@ Handré Stolp
 <span class="kw">end</span></code></pre>
 </dd>
 </dl>
+</div><div class="section slide level2" id="extensibility-meta-table">
+<h1>Extensibility (Meta table)</h1>
+<ul class="incremental">
+<li>Can extend tables and userdata using meta tables</li>
+<li>Meta table is a plain <em>Lua</em> table</li>
+<li>Meta table bound to userdata or table using <code>setmetatable(t, mt)</code> function</li>
+<li>Inserting functions at specific keys specialize behaviour
+<ul class="incremental">
+<li>Arithmetic : <code>__add</code>, <code>__sub</code> etc.</li>
+<li>Comparison : <code>__eq</code>, <code>__lt</code> and <code>__le</code>.</li>
+<li>Key lookup and new key insertion : <code>__index</code> and <code>__newindex</code></li>
+<li>Function call (using object as a function): <code>__call</code></li>
+<li>Finalizers : <code>__gc</code></li>
+</ul></li>
+</ul>
 </div>
 </body>
 </html>
