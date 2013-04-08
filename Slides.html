@@ -59,7 +59,7 @@ Handré Stolp
 <ul class="incremental">
 <li>Portable ANSI C</li>
 <li>Does not come with batteries</li>
-<li>Can squeeze runtime and standard libraries into</li>
+<li>Can squeeze runtime and standard libraries into approximately 98 KB</li>
 </ul></li>
 </ul>
 </div>
@@ -419,9 +419,47 @@ Handré Stolp
 <li>Comparison : <code>__eq</code>, <code>__lt</code> and <code>__le</code>.</li>
 <li>Key lookup and new key insertion : <code>__index</code> and <code>__newindex</code></li>
 <li>Function call (using object as a function): <code>__call</code></li>
-<li>Finalizers : <code>__gc</code></li>
+<li>Finalizers : <code>__gc</code> must be set from <em>C</em></li>
 </ul></li>
 </ul>
+</div><div class="section slide level2" id="metatable-example">
+<h1>Metatable example</h1>
+<ul>
+<li>Fibber object based on some number <code>n</code></li>
+<li>Fibbers can be added or subtracked</li>
+<li>Can't add any values to fibbers</li>
+<li>Applying function call to fibbers returns n_th fibonacci number</li>
+</ul>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">local</span> <span class="kw">mtFibber</span> <span class="ot">=</span> <span class="ot">{}</span>
+<span class="kw">function</span> makeFibber<span class="ot">(</span><span class="kw">n</span><span class="ot">)</span>
+    <span class="kw">local</span> <span class="kw">f</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">n</span> <span class="ot">=</span> <span class="kw">n</span><span class="ot">}</span>
+    <span class="fu">setmetatable</span><span class="ot">(</span><span class="kw">f</span><span class="ot">,</span> <span class="kw">mtFibber</span><span class="ot">)</span>
+    <span class="kw">return</span> <span class="kw">f</span>
+<span class="kw">end</span>
+<span class="kw">do</span>
+    <span class="kw">function</span> <span class="kw">mtFibber</span>:__call<span class="ot">()</span>
+        <span class="kw">local</span> <span class="kw">n</span> <span class="ot">=</span> <span class="fu">math.max</span><span class="ot">(</span><span class="kw">self</span><span class="ot">.</span><span class="kw">n</span><span class="ot">,</span><span class="dv">0</span><span class="ot">)</span>
+        <span class="kw">local</span> <span class="kw">function</span> _fib<span class="ot">(</span><span class="kw">fn2</span><span class="ot">,</span> <span class="kw">fn1</span><span class="ot">,</span> <span class="kw">at</span><span class="ot">)</span>
+            <span class="kw">if</span> <span class="kw">at</span> <span class="ot">==</span> <span class="kw">n</span> <span class="kw">then</span> 
+                <span class="kw">return</span> <span class="kw">fn1</span> <span class="ot">+</span> <span class="kw">fn2</span>
+            <span class="kw">else</span>
+                <span class="kw">return</span> _fib<span class="ot">(</span><span class="kw">fn1</span><span class="ot">,</span> <span class="kw">fn1</span> <span class="ot">+</span> <span class="kw">fn2</span><span class="ot">,</span> <span class="kw">at</span><span class="ot">+</span><span class="dv">1</span><span class="ot">)</span>
+            <span class="kw">end</span>
+        <span class="kw">end</span>
+        <span class="kw">if</span> <span class="kw">n</span> <span class="ot">&lt;=</span> <span class="dv">0</span> <span class="kw">then</span> <span class="kw">return</span> <span class="dv">0</span>
+        <span class="kw">elseif</span> <span class="kw">n</span> <span class="ot">==</span> <span class="dv">1</span> <span class="kw">then</span> <span class="kw">return</span> <span class="dv">1</span>
+        <span class="kw">else</span> <span class="kw">return</span> _fib<span class="ot">(</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">1</span><span class="ot">,</span> <span class="dv">2</span><span class="ot">)</span> <span class="kw">end</span>
+    <span class="kw">end</span>
+    <span class="kw">function</span> <span class="kw">mtFibber</span><span class="ot">.</span>__add<span class="ot">(</span><span class="kw">lhs</span><span class="ot">,</span> <span class="kw">rhs</span><span class="ot">)</span> <span class="kw">return</span> makeFibber<span class="ot">(</span><span class="kw">lhs</span><span class="ot">.</span><span class="kw">n</span> <span class="ot">+</span> <span class="kw">rhs</span><span class="ot">.</span><span class="kw">n</span><span class="ot">)</span> <span class="kw">end</span>
+    <span class="kw">function</span> <span class="kw">mtFibber</span><span class="ot">.</span>__sub<span class="ot">(</span><span class="kw">lhs</span><span class="ot">,</span> <span class="kw">rhs</span><span class="ot">)</span> <span class="kw">return</span> makeFibber<span class="ot">(</span><span class="kw">lhs</span><span class="ot">.</span><span class="kw">n</span> <span class="ot">-</span> <span class="kw">rhs</span><span class="ot">.</span><span class="kw">n</span><span class="ot">)</span> <span class="kw">end</span>
+    <span class="kw">function</span> <span class="kw">mtFibber</span>:__newindex<span class="ot">(</span><span class="kw">k</span><span class="ot">,</span><span class="kw">v</span><span class="ot">)</span> <span class="fu">assert</span><span class="ot">(</span><span class="kw">false</span><span class="ot">,</span> <span class="st">&quot;can&#39;t add members&quot;</span><span class="ot">)</span> <span class="kw">end</span>
+<span class="kw">end</span>
+<span class="kw">local</span> <span class="kw">f1</span> <span class="ot">=</span> makeFibber<span class="ot">(</span><span class="dv">10</span><span class="ot">)</span>
+<span class="kw">local</span> <span class="kw">f2</span> <span class="ot">=</span> makeFibber<span class="ot">(</span><span class="dv">5</span><span class="ot">)</span>
+<span class="kw">local</span> <span class="kw">f3</span> <span class="ot">=</span> makeFibber<span class="ot">(</span><span class="dv">100</span><span class="ot">)</span>
+<span class="kw">local</span> <span class="kw">f4</span> <span class="ot">=</span> <span class="ot">(</span><span class="kw">f3</span> <span class="ot">+</span> <span class="kw">f2</span> <span class="ot">-</span> <span class="kw">f1</span><span class="ot">)</span>
+<span class="co">-- The 95th fibonacci is 3.194043463499e+019</span>
+<span class="fu">print</span> <span class="ot">(</span><span class="st">&quot;The &quot;</span> <span class="ot">..</span> <span class="kw">f4</span><span class="ot">.</span><span class="kw">n</span> <span class="ot">..</span> <span class="st">&quot;nth fibonacci number is &quot;</span> <span class="ot">..</span> f4<span class="ot">())</span></code></pre>
 </div>
 </body>
 </html>

@@ -19,7 +19,7 @@ What is Lua
 * Its is portable and minimalist
 	* Portable ANSI C
 	* Does not come with batteries
-	* Can squeeze runtime and standard libraries into 
+	* Can squeeze runtime and standard libraries into approximately 98 KB 
 
 The Language 
 ========================================
@@ -436,4 +436,46 @@ Extensibility (Meta table)
     * Comparison : `__eq`, `__lt` and `__le`.
     * Key lookup and new key insertion : `__index` and `__newindex`
     * Function call (using object as a function): `__call`
-    * Finalizers : `__gc`
+    * Finalizers : `__gc` must be set from _C_
+* Meta tables used 
+
+Metatable example
+--------------------------------------
+
+> * Fibber object based on some number `n`
+> * Fibbers can be added or subtracked 
+> * Can't add any values to fibbers
+> * Applying function call to fibbers returns n_th fibonacci number
+
+```lua
+local mtFibber = {}
+function makeFibber(n)
+    local f = {n = n}
+    setmetatable(f, mtFibber)
+    return f
+end
+do
+    function mtFibber:__call()
+        local n = math.max(self.n,0)
+        local function _fib(fn2, fn1, at)
+            if at == n then 
+                return fn1 + fn2
+            else
+                return _fib(fn1, fn1 + fn2, at+1)
+            end
+        end
+        if n <= 0 then return 0
+        elseif n == 1 then return 1
+        else return _fib(0, 1, 2) end
+    end
+    function mtFibber.__add(lhs, rhs) return makeFibber(lhs.n + rhs.n) end
+    function mtFibber.__sub(lhs, rhs) return makeFibber(lhs.n - rhs.n) end
+    function mtFibber:__newindex(k,v) assert(false, "can't add members") end
+end
+local f1 = makeFibber(10)
+local f2 = makeFibber(5)
+local f3 = makeFibber(100)
+local f4 = (f3 + f2 - f1)
+-- The 95th fibonacci is 3.194043463499e+019
+print ("The " .. f4.n .. "nth fibonacci number is " .. f4())
+```
