@@ -59,7 +59,86 @@ Handré Stolp
 <ul class="incremental">
 <li>Portable ANSI C</li>
 <li>Does not come with batteries</li>
-<li>Can squeeze runtime and standard libraries into approximately 98 KB</li>
+<li>Can squeeze runtime and standard libraries into approximately 98 KB (usually 182K to 243K)</li>
+</ul></li>
+</ul>
+</div><div class="section slide level2" id="where-did-come-from-where-is-it-used">
+<h1>Where did come from where is it used</h1>
+<ul class="incremental">
+<li>Tecgraf group at PUC-Rio Brazil</li>
+<li>Lua means moon in Portugese</li>
+<li>Used a lot in gaming (World of Warcaft, Angry Birds)</li>
+<li>Used to add scripting to applications (SciTE, WireShark, Awesome)</li>
+<li>Full blown systems
+<ul class="incremental">
+<li>Premake - cross platform building</li>
+<li>Sputnik - web content management system</li>
+</ul></li>
+<li>Embedded systems through eLua
+<ul class="incremental">
+<li>Targets running directly on microcontroller</li>
+<li>eLuaBrain - eLua based full dev environment on MCU</li>
+</ul></li>
+<li>Mobile - Supported on iOS and Android</li>
+</ul>
+</div><div class="section slide level2" id="what-flavours-are-there">
+<h1>What flavours are there</h1>
+<dl class="incremental">
+<dt>Lua 5.1.x</dt>
+<dd>Most widely used standard Lua distribution
+</dd>
+<dd>Supports any system that can compile ANSI C
+</dd>
+<dt>Lua 5.2.x</dt>
+<dd>The newest Lua.
+</dd>
+<dd>Not that widely supported yet.
+</dd>
+<dd>Supports any system that can compile ANSI C
+</dd>
+<dt>LuaJit</dt>
+<dd>Blindingly fast just in time compiler that is Lua 5.1.x compatible.
+</dd>
+<dd>Supports dynamic FFI to <em>C</em> shared libraries
+</dd>
+<dd><p>Supported OS</p>
+<ul class="incremental">
+<li>Linux</li>
+<li>Android</li>
+<li>BSD</li>
+<li>OSX</li>
+<li>iOS</li>
+<li>Windows</li>
+</ul>
+</dd>
+<dd><p>Supported CPU</p>
+<ul class="incremental">
+<li>x86 32 bit 64 bit</li>
+<li>ARMv5+, ARM9E+</li>
+<li>PPC/e500v2</li>
+<li>MIPS</li>
+</ul>
+</dd>
+</dl>
+</div><div class="section slide level2" id="how-to-get-it">
+<h1>How to get it</h1>
+<ul class="incremental">
+<li>Get the source and compile into your application
+<ul class="incremental">
+<li><a href="http://www.lua.org/versions.html">http://www.lua.org/versions.html</a></li>
+<li><a href="http://luajit.org/download.html">http://luajit.org/download.html</a></li>
+</ul></li>
+<li>Use LuaRocks <a href="http://luarocks.org/">http://luarocks.org/</a>
+<ul class="incremental">
+<li>Deployment and management system for Lua modules</li>
+</ul></li>
+<li>Use LuaDist <a href="http://luadist.org/">http://luadist.org/</a>
+<ul class="incremental">
+<li>Deployment and management system for Lua modules</li>
+</ul></li>
+<li>Install Lua for Windows <a href="https://code.google.com/p/luaforwindows/">https://code.google.com/p/luaforwindows/</a>
+<ul class="incremental">
+<li>Batteries included installation.</li>
 </ul></li>
 </ul>
 </div>
@@ -421,6 +500,7 @@ Handré Stolp
 <li>Function call (using object as a function): <code>__call</code></li>
 <li>Finalizers : <code>__gc</code> must be set from <em>C</em></li>
 </ul></li>
+<li>The meta table mechanism is used to extend <em>Lua</em> semantically as needed.</li>
 </ul>
 </div><div class="section slide level2" id="metatable-example">
 <h1>Metatable example</h1>
@@ -461,5 +541,252 @@ Handré Stolp
 <span class="co">-- The 95th fibonacci is 3.194043463499e+019</span>
 <span class="fu">print</span> <span class="ot">(</span><span class="st">&quot;The &quot;</span> <span class="ot">..</span> <span class="kw">f4</span><span class="ot">.</span><span class="kw">n</span> <span class="ot">..</span> <span class="st">&quot;nth fibonacci number is &quot;</span> <span class="ot">..</span> f4<span class="ot">())</span></code></pre>
 </div>
+<div class="section titleslide slide level1" id="addons"><h1>Addons</h1></div><div class="section slide level2" id="iup">
+<h1>IUP</h1>
+<ul>
+<li>Cross platform native GUI toolkit.</li>
+<li>Supports declerative way of GUI definition.</li>
+</ul>
+<div class="figure">
+<img src="IupDialog.png" alt="IUP Dialog" /><p class="caption">IUP Dialog</p>
+</div>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="fu">require</span> <span class="st">&quot;iuplua&quot;</span>
+<span class="fu">require</span> <span class="st">&quot;iupluacontrols&quot;</span>
+<span class="kw">local</span> <span class="kw">label</span>
+<span class="kw">local</span> <span class="kw">text</span> <span class="ot">=</span> <span class="st">&quot;&quot;</span>
+<span class="kw">local</span> <span class="kw">function</span> onText<span class="ot">(</span><span class="kw">self</span><span class="ot">)</span>
+    <span class="kw">text</span> <span class="ot">=</span> <span class="fu">string.upper</span><span class="ot">(</span><span class="kw">self</span><span class="ot">.</span><span class="kw">value</span><span class="ot">)</span>
+<span class="kw">end</span>
+<span class="kw">local</span> <span class="kw">function</span> modifyLabel<span class="ot">(</span><span class="kw">self</span><span class="ot">)</span>
+    <span class="kw">if</span> <span class="kw">label</span> <span class="kw">then</span> 
+        <span class="kw">label</span><span class="ot">.</span><span class="kw">title</span> <span class="ot">=</span> <span class="kw">text</span>
+    <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="kw">dlg</span> <span class="ot">=</span> <span class="kw">iup</span><span class="ot">.</span><span class="kw">dialog</span>
+<span class="ot">{</span>
+    <span class="kw">iup</span><span class="ot">.</span><span class="kw">vbox</span>
+    <span class="ot">{</span>
+        <span class="kw">iup</span><span class="ot">.</span>label<span class="ot">{</span><span class="kw">title</span> <span class="ot">=</span> <span class="st">&#39;A silly little dialog&#39;</span><span class="ot">,</span> <span class="kw">map_cb</span> <span class="ot">=</span> <span class="kw">function</span><span class="ot">(</span><span class="kw">self</span><span class="ot">)</span> <span class="kw">label</span> <span class="ot">=</span> <span class="kw">self</span> <span class="kw">end</span><span class="ot">},</span>
+        <span class="kw">iup</span><span class="ot">.</span><span class="kw">vbox</span>
+            <span class="ot">{</span>
+                <span class="kw">iup</span><span class="ot">.</span><span class="kw">hbox</span>
+                <span class="ot">{</span>
+                    <span class="kw">iup</span><span class="ot">.</span>label<span class="ot">{</span><span class="kw">title</span><span class="ot">=</span><span class="st">&#39;Write text&#39;</span><span class="ot">,</span> <span class="kw">size</span><span class="ot">=</span><span class="st">&quot;80&quot;</span><span class="ot">},</span>
+                    <span class="kw">iup</span><span class="ot">.</span>text<span class="ot">{</span><span class="kw">size</span><span class="ot">=</span><span class="st">&quot;80&quot;</span><span class="ot">,</span> <span class="kw">valuechanged_cb</span> <span class="ot">=</span> <span class="kw">onText</span><span class="ot">}</span>
+                    <span class="ot">;</span><span class="kw">margin</span><span class="ot">=</span><span class="st">&quot;0&quot;</span><span class="ot">,</span> <span class="kw">gap</span><span class="ot">=</span><span class="st">&quot;10&quot;</span>
+                <span class="ot">};</span>
+                <span class="kw">iup</span><span class="ot">.</span><span class="kw">hbox</span>
+                <span class="ot">{</span>
+                    <span class="kw">iup</span><span class="ot">.</span>button<span class="ot">{</span><span class="kw">title</span><span class="ot">=</span><span class="st">&quot;Ok&quot;</span><span class="ot">,</span><span class="kw">size</span><span class="ot">=</span><span class="st">&quot;40&quot;</span><span class="ot">,</span> <span class="kw">action</span> <span class="ot">=</span> <span class="kw">modifyLabel</span><span class="ot">},</span>
+                    <span class="kw">iup</span><span class="ot">.</span>button<span class="ot">{</span><span class="kw">title</span><span class="ot">=</span><span class="st">&quot;Cancel&quot;</span><span class="ot">,</span><span class="kw">size</span><span class="ot">=</span><span class="st">&quot;40&quot;</span> <span class="ot">,</span> <span class="kw">action</span> <span class="ot">=</span> <span class="kw">function</span> <span class="ot">()</span> <span class="kw">return</span> <span class="kw">iup</span><span class="ot">.</span><span class="kw">CLOSE</span> <span class="kw">end</span><span class="ot">}</span>
+                    <span class="ot">;</span><span class="kw">margin</span><span class="ot">=</span><span class="st">&quot;0&quot;</span><span class="ot">,</span> <span class="kw">gap</span><span class="ot">=</span><span class="st">&quot;10&quot;</span>
+                <span class="ot">};</span>  
+            <span class="ot">}</span>
+        <span class="ot">;</span><span class="kw">margin</span><span class="ot">=</span><span class="st">&quot;5x5&quot;</span><span class="ot">,</span> <span class="kw">gap</span><span class="ot">=</span><span class="st">&quot;5&quot;</span>
+    <span class="ot">}</span>
+    <span class="ot">;</span><span class="kw">title</span><span class="ot">=</span><span class="st">&quot;Some dialog&quot;</span><span class="ot">,</span> <span class="kw">resize</span><span class="ot">=</span><span class="st">&quot;NO&quot;</span>
+<span class="ot">}</span>
+<span class="kw">dlg</span>:popup<span class="ot">()</span></code></pre>
+</div><div class="section slide level2" id="cosmo">
+<h1>Cosmo</h1>
+<ul>
+<li>Cosmo is a “safe templates” engine.</li>
+<li>It allows you to fill nested templates.</li>
+<li>Many of the advantages of Turing-complete template engines, without without the downside of allowing arbitrary code in the templates.</li>
+</ul>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">local</span> <span class="kw">cosmo</span> <span class="ot">=</span> <span class="fu">require</span> <span class="st">&quot;cosmo&quot;</span>
+<span class="kw">mycards</span> <span class="ot">=</span> <span class="ot">{</span> <span class="ot">{</span><span class="kw">rank</span><span class="ot">=</span><span class="st">&quot;Ace&quot;</span><span class="ot">,</span> <span class="kw">suit</span><span class="ot">=</span><span class="st">&quot;Spades&quot;</span><span class="ot">}</span>
+          <span class="ot">,</span> <span class="ot">{</span><span class="kw">rank</span><span class="ot">=</span><span class="st">&quot;Queen&quot;</span><span class="ot">,</span> <span class="kw">suit</span><span class="ot">=</span><span class="st">&quot;Diamonds&quot;</span><span class="ot">}</span>
+          <span class="ot">,</span> <span class="ot">{</span><span class="kw">rank</span><span class="ot">=</span><span class="st">&quot;10&quot;</span><span class="ot">,</span> <span class="kw">suit</span><span class="ot">=</span><span class="st">&quot;Hearts&quot;</span><span class="ot">}</span> 
+          <span class="ot">}</span> 
+<span class="kw">template</span> <span class="ot">=</span> <span class="st">&quot;$do_cards[[$rank of $suit, ]]&quot;</span>
+<span class="co">-- prints Ace of Spades, Queen of Diamonds, 10 of Hearts,</span>
+<span class="fu">print</span> <span class="ot">(</span><span class="kw">cosmo</span><span class="ot">.</span>fill<span class="ot">(</span><span class="kw">template</span><span class="ot">,</span> <span class="ot">{</span><span class="kw">do_cards</span> <span class="ot">=</span> <span class="kw">mycards</span><span class="ot">}))</span></code></pre>
+</div><div class="section slide level2" id="penlight">
+<h1>Penlight</h1>
+<ul>
+<li>Your batteries for general development</li>
+<li>Adds support for functional style</li>
+</ul>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">local</span> <span class="kw">List</span> <span class="ot">=</span> <span class="fu">require</span> <span class="st">&#39;pl.List&#39;</span>  
+<span class="kw">local</span> <span class="kw">func</span> <span class="ot">=</span> <span class="fu">require</span> <span class="st">&#39;pl.func&#39;</span>  
+<span class="fu">print</span> <span class="ot">(</span>List<span class="ot">{</span><span class="dv">10</span><span class="ot">,</span><span class="dv">20</span><span class="ot">,</span><span class="dv">30</span><span class="ot">}</span>:map<span class="ot">(</span><span class="kw">_1</span><span class="ot">+</span><span class="dv">1</span><span class="ot">)</span>:reduce <span class="st">&#39;+&#39;</span><span class="ot">)</span> <span class="co">-- prints 63</span></code></pre>
+<ul>
+<li>Standard class system using meta tables</li>
+</ul>
+<pre class="sourceCode lua"><code class="sourceCode lua"> <span class="kw">class</span> <span class="ot">=</span> <span class="fu">require</span> <span class="st">&#39;pl.class&#39;</span>
+
+ <span class="kw">class</span><span class="ot">.</span>Animal<span class="ot">()</span>
+ <span class="kw">function</span> <span class="kw">Animal</span>:_init<span class="ot">(</span><span class="kw">name</span><span class="ot">)</span>
+     <span class="kw">self</span><span class="ot">.</span><span class="kw">name</span> <span class="ot">=</span> <span class="kw">name</span>
+ <span class="kw">end</span>
+ <span class="kw">function</span> <span class="kw">Animal</span>:__tostring<span class="ot">()</span>
+   <span class="kw">return</span> <span class="kw">self</span><span class="ot">.</span><span class="kw">name</span><span class="ot">..</span><span class="st">&#39;: &#39;</span><span class="ot">..</span><span class="kw">self</span>:speak<span class="ot">()</span>
+ <span class="kw">end</span>
+
+ <span class="kw">class</span><span class="ot">.</span>Dog<span class="ot">(</span><span class="kw">Animal</span><span class="ot">)</span>
+ <span class="kw">function</span> <span class="kw">Dog</span>:speak<span class="ot">()</span>
+   <span class="kw">return</span> <span class="st">&#39;bark&#39;</span>
+ <span class="kw">end</span>
+
+ <span class="kw">class</span><span class="ot">.</span>Cat<span class="ot">(</span><span class="kw">Animal</span><span class="ot">)</span>
+ <span class="kw">function</span> <span class="kw">Cat</span>:_init<span class="ot">(</span><span class="kw">name</span><span class="ot">,</span><span class="kw">breed</span><span class="ot">)</span>
+     <span class="kw">self</span>:super<span class="ot">(</span><span class="kw">name</span><span class="ot">)</span>  <span class="co">-- must init base!</span>
+     <span class="kw">self</span><span class="ot">.</span><span class="kw">breed</span> <span class="ot">=</span> <span class="kw">breed</span>
+ <span class="kw">end</span>
+ <span class="kw">function</span> <span class="kw">Cat</span>:speak<span class="ot">()</span>
+   <span class="kw">return</span> <span class="st">&#39;meow&#39;</span>
+ <span class="kw">end</span>
+
+<span class="kw">fido</span> <span class="ot">=</span> Dog<span class="ot">(</span><span class="st">&#39;Fido&#39;</span><span class="ot">)</span>
+<span class="kw">felix</span> <span class="ot">=</span> Cat<span class="ot">(</span><span class="st">&#39;Felix&#39;</span><span class="ot">,</span><span class="st">&#39;Tabby&#39;</span><span class="ot">)</span>
+
+<span class="fu">print</span><span class="ot">(</span><span class="kw">fido</span><span class="ot">,</span><span class="kw">felix</span><span class="ot">)</span>        <span class="co">-- Fido: bark Felix: meow</span>
+<span class="fu">print</span><span class="ot">(</span><span class="kw">felix</span>:is_a<span class="ot">(</span><span class="kw">Animal</span><span class="ot">)</span> <span class="co">-- true</span>
+<span class="fu">print</span><span class="ot">(</span><span class="kw">felix</span>:is_a<span class="ot">(</span><span class="kw">Dog</span><span class="ot">))</span>   <span class="co">-- false</span>
+<span class="fu">print</span><span class="ot">(</span><span class="kw">felix</span>:is_a<span class="ot">(</span><span class="kw">Cat</span><span class="ot">))</span>   <span class="co">-- true</span></code></pre>
+</div><div class="section slide level2" id="metalua">
+<h1>MetaLua</h1>
+<ul>
+<li>Static meta programming system for Lua</li>
+<li>Alter compilation process in arbitrary, powerful and maintainable ways</li>
+<li>Comes with some useful extensions built in</li>
+<li>Pattern matching like in Haskell an ML</li>
+<li>list comprehension</li>
+</ul>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="ot">-{</span>extension <span class="st">&quot;clist&quot;</span><span class="ot">}</span>
+
+<span class="co">-- integers from 2 to 50, by steps of 2:</span>
+<span class="kw">x</span> <span class="ot">=</span> <span class="ot">{</span> <span class="kw">i</span> <span class="kw">for</span> <span class="kw">i</span> <span class="ot">=</span> <span class="dv">2</span><span class="ot">,</span> <span class="dv">50</span><span class="ot">,</span> <span class="dv">2</span> <span class="ot">}</span>
+
+<span class="co">-- the same, obtained by filtering over all integers &lt;= 50:</span>
+<span class="kw">y</span> <span class="ot">=</span> <span class="ot">{</span> <span class="kw">i</span> <span class="kw">for</span> <span class="kw">i</span> <span class="ot">=</span> <span class="dv">1</span><span class="ot">,</span> <span class="dv">50</span> <span class="kw">if</span> <span class="kw">i</span>%<span class="dv">2</span><span class="ot">==</span><span class="dv">0</span> <span class="ot">}</span>
+
+
+<span class="ot">-{</span>extension <span class="st">&#39;match&#39;</span><span class="ot">}</span>
+
+match <span class="ot">{</span> <span class="ot">{</span> <span class="st">&#39;o&#39;</span><span class="ot">,</span> <span class="st">&#39;k&#39;</span><span class="ot">,</span> <span class="st">&#39;!&#39;</span> <span class="ot">}</span> <span class="ot">}</span> <span class="kw">with</span>
+| <span class="ot">{</span> <span class="kw">t</span> <span class="ot">}</span> <span class="ot">-&gt;</span> <span class="kw">match</span> <span class="kw">t</span> <span class="kw">with</span>
+   | <span class="ot">{</span> <span class="kw">a</span><span class="ot">,</span> <span class="kw">b</span> <span class="ot">}</span>      <span class="ot">-&gt;</span> <span class="fu">print</span> <span class="st">&#39;KO&#39;</span>
+   | <span class="ot">{</span> <span class="kw">a</span><span class="ot">,</span> <span class="kw">b</span><span class="ot">,</span> <span class="ot">...</span> <span class="ot">}</span> <span class="ot">-&gt;</span> <span class="fu">print</span> <span class="ot">(</span><span class="kw">a</span><span class="ot">..</span><span class="kw">b</span><span class="ot">)</span>
+   | <span class="kw">_</span>             <span class="ot">-&gt;</span> <span class="fu">print</span> <span class="st">&#39;KO&#39;</span>
+   <span class="kw">end</span>
+| <span class="kw">_</span> <span class="ot">-&gt;</span> <span class="fu">print</span> <span class="st">&#39;KO&#39;</span>
+<span class="kw">end</span></code></pre>
+</div>
+<div class="section titleslide slide level1" id="how-do-we-use-it"><h1>How do we use it</h1></div><div class="section slide level2" id="build-automation">
+<h1>Build Automation</h1>
+<ul class="incremental">
+<li>Scripts to pull repository version info into builds</li>
+<li>Scripts to generate project skeletons</li>
+<li>Scripts to generate code</li>
+</ul>
+</div><div class="section slide level2" id="data-definition-language">
+<h1>Data definition language</h1>
+<ul>
+<li>Instead of writing a compiler</li>
+<li>We defined a DSL based on <em>Lua</em> tables</li>
+<li>Use <em>Lua</em> as the compiler</li>
+<li>Generate <em>C++</em> code</li>
+</ul>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">FLiDataCompiler</span>
+<span class="ot">{</span><span class="kw">INCLUDE_PCH</span> <span class="ot">=</span> <span class="st">[[#include &quot;fliModelsPCH.h&quot;]]</span><span class="ot">;</span>
+ <span class="kw">INCLUDE_LIB</span> <span class="ot">=</span> <span class="st">[[#include &quot;../fliModelsLib.h&quot;]]</span><span class="ot">;</span>
+ <span class="kw">EXPORT_DECL</span> <span class="ot">=</span> <span class="st">[[fliMODELS_API]]</span><span class="ot">;</span>
+ <span class="kw">INCLUDES</span> <span class="ot">=</span> <span class="ot">{</span><span class="st">&quot;dmlGoalState.dsd&quot;</span><span class="ot">,</span> <span class="st">&quot;dmlGoalChildrenConstraint.dsd&quot;</span><span class="ot">,</span> <span class="st">&quot;dmlTrigger.dmd&quot;</span><span class="ot">};</span>
+ <span class="st">[[ @brief  Goals are a hierarchical way to define what an entity is required to achieve. </span>
+<span class="st"> ]]</span><span class="ot">;</span>
+ <span class="kw">MODEL</span> <span class="ot">=</span> <span class="ot">{</span><span class="st">&quot;fli::act::DGoal&quot;</span><span class="ot">;</span>
+    <span class="st">[[@brief String used to categorize the goal with categories seperated by / also used to identify the goal]]</span><span class="ot">;</span>
+    <span class="ot">{</span><span class="st">&quot;Category&quot;</span><span class="ot">,</span> <span class="ot">{</span><span class="st">&quot;string&quot;</span><span class="ot">,</span> <span class="dv">1</span><span class="ot">}};</span>
+ 
+    <span class="st">[[@brief The current active state of the goal]]</span><span class="ot">;</span>
+    <span class="ot">{</span><span class="st">&quot;State&quot;</span><span class="ot">,</span> <span class="ot">{</span><span class="st">&quot;EGoalState&quot;</span><span class="ot">,</span> <span class="dv">2</span><span class="ot">,</span> <span class="kw">default</span><span class="ot">=</span><span class="st">&#39;GOAL_INACTIVE&#39;</span><span class="ot">}};</span>
+ 
+    <span class="st">[[@brief Constrain how the goal&#39;s children become active when it is active]]</span><span class="ot">;</span>
+    <span class="ot">{</span><span class="st">&quot;ChildrenConstraint&quot;</span><span class="ot">,</span> <span class="ot">{</span><span class="st">&quot;EGoalChildrenConstraint&quot;</span><span class="ot">,</span> <span class="dv">3</span><span class="ot">,</span> <span class="kw">default</span><span class="ot">=</span><span class="st">&quot;GOAL_CHILDREN_ACTIVE_CONCURRENTLY&quot;</span><span class="ot">}};</span>
+
+    <span class="st">[[@brief Child goals]]</span><span class="ot">;</span>
+    <span class="ot">{</span><span class="st">&quot;Children&quot;</span><span class="ot">,</span> <span class="ot">{</span><span class="st">&quot;array&lt;DGoal&gt;&quot;</span><span class="ot">,</span> <span class="dv">4</span><span class="ot">}};</span>
+
+    <span class="ot">...</span>
+    <span class="ot">...</span>
+
+    <span class="st">[[@brief The number of times the goal has passed]]</span><span class="ot">;</span>
+    <span class="ot">{</span><span class="st">&quot;PassedCount&quot;</span><span class="ot">,</span> <span class="ot">{</span><span class="st">&quot;int32&quot;</span><span class="ot">,</span> <span class="dv">9</span><span class="ot">,</span> <span class="kw">set</span><span class="ot">=</span><span class="kw">false</span><span class="ot">}};</span>
+
+    <span class="st">[[@brief The number of times the goal has failed]]</span><span class="ot">;</span>
+    <span class="ot">{</span><span class="st">&quot;FailedCount&quot;</span><span class="ot">,</span> <span class="ot">{</span><span class="st">&quot;int32&quot;</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">,</span> <span class="kw">set</span><span class="ot">=</span><span class="kw">false</span><span class="ot">}};</span>
+
+ <span class="ot">};</span>
+<span class="ot">};</span></code></pre>
+</div><div class="section slide level2" id="data-description-language">
+<h1>Data description language</h1>
+<ul>
+<li>We have component hierarchies which can be serialized as XML, binary etc.</li>
+<li>XML is not human write friendly</li>
+<li>We use <em>Lua</em>'s tables to declaritively build the hierarchies</li>
+<li>This is more succint</li>
+<li>This is more flexible</li>
+<li>Still have full power of <em>Lua</em> where needed</li>
+</ul>
+<pre class="sourceCode lua"><code class="sourceCode lua"><span class="kw">fli_data</span><span class="ot">.</span>ScopeModelCreate<span class="ot">()</span>
+<span class="kw">local</span> <span class="kw">DoNotRegister</span> <span class="ot">=</span> <span class="kw">true</span>  <span class="co">-- Do not register with fli::data::CManager</span>
+
+<span class="co">-----------------------------------------------------</span>
+<span class="co">-- Scenario world</span>
+<span class="co">-----------------------------------------------------</span>
+<span class="co">-- Define the whole world for the scenario defining which extensions the world has as well as all the entities which are</span>
+<span class="co">-- present in the world. </span>
+<span class="kw">return</span> Root<span class="ot">(</span>fli__ent__DWorld<span class="ot">(</span><span class="st">&quot;World&quot;</span><span class="ot">),</span> <span class="kw">DoNotRegister</span><span class="ot">)</span>
+<span class="ot">{</span>
+    <span class="kw">Extensions</span> <span class="ot">=</span>
+    <span class="ot">{</span>
+        <span class="co">-- Extension that defines information related to the scenario but not a specific entity</span>
+        <span class="kw">fli__ent__DScenarioInfo</span>
+        <span class="ot">{</span>
+            <span class="kw">Name</span> <span class="ot">=</span> <span class="st">&quot;Tutorial_03_SimpleVehicle&quot;</span><span class="ot">;</span>     
+            <span class="kw">FocusEntity</span> <span class="ot">=</span> RefModel<span class="ot">(</span><span class="st">&quot;World:Entities.1&quot;</span><span class="ot">);</span>
+        <span class="ot">};</span>
+    <span class="ot">};</span>
+    
+    <span class="kw">Entities</span> <span class="ot">=</span> 
+    <span class="ot">{</span>
+        Import<span class="ot">(</span><span class="fu">assert</span><span class="ot">(</span>RelToData <span class="st">&quot;FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/Terrain.lua&quot;</span><span class="ot">))</span>
+        <span class="ot">{</span>           
+            <span class="kw">InInitialTimeOfDay</span> <span class="ot">=</span> <span class="dv">16</span> <span class="ot">*</span> <span class="dv">60</span> <span class="ot">*</span> <span class="dv">60</span><span class="ot">;</span>
+        <span class="ot">};</span>
+    
+        Import<span class="ot">(</span><span class="fu">assert</span><span class="ot">(</span>RelToData <span class="st">&quot;FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/SimpleEntityOfTutorial2.lua&quot;</span><span class="ot">))</span>
+        <span class="ot">{</span>           
+            <span class="kw">InName</span> <span class="ot">=</span> <span class="st">&quot;My Imported Entity&quot;</span><span class="ot">;</span>
+            <span class="kw">InPhysicsEnableDebugDrawing</span> <span class="ot">=</span> <span class="kw">true</span><span class="ot">;</span>
+            <span class="kw">InPosition</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">x</span><span class="ot">=-</span><span class="dv">100</span><span class="ot">;</span><span class="kw">y</span><span class="ot">=</span><span class="dv">50</span><span class="ot">;</span><span class="kw">z</span><span class="ot">=</span><span class="dv">0</span><span class="ot">;};</span>
+            <span class="kw">InOrientation</span> <span class="ot">=</span> QuaternionToTable<span class="ot">(</span> OrientFromYPRd<span class="ot">(</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">)</span> <span class="ot">);</span>
+            <span class="kw">InVisualColour</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">r</span><span class="ot">=</span><span class="dv">0</span><span class="ot">,</span> <span class="kw">g</span><span class="ot">=</span><span class="dv">1</span><span class="ot">,</span> <span class="kw">b</span><span class="ot">=</span><span class="dv">0</span><span class="ot">,</span> <span class="kw">a</span><span class="ot">=</span><span class="dv">1</span><span class="ot">};</span>
+        <span class="ot">};</span>
+        
+        Import<span class="ot">(</span><span class="fu">assert</span><span class="ot">(</span>RelToData <span class="st">&quot;FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/SimpleEntityOfTutorial2.lua&quot;</span><span class="ot">))</span>
+        <span class="ot">{</span>           
+            <span class="kw">InName</span> <span class="ot">=</span> <span class="st">&quot;My Second Imported Entity&quot;</span><span class="ot">;</span>
+            <span class="kw">InPhysicsEnableDebugDrawing</span> <span class="ot">=</span> <span class="kw">true</span><span class="ot">;</span>
+            <span class="kw">InPosition</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">x</span><span class="ot">=-</span><span class="dv">100</span><span class="ot">;</span><span class="kw">y</span><span class="ot">=</span><span class="dv">50</span><span class="ot">;</span><span class="kw">z</span><span class="ot">=</span><span class="dv">10</span><span class="ot">;};</span>
+            <span class="kw">InOrientation</span> <span class="ot">=</span> QuaternionToTable<span class="ot">(</span> OrientFromYPRd<span class="ot">(</span>DEG_TO_RAD<span class="ot">(</span><span class="dv">60</span><span class="ot">),</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">)</span> <span class="ot">);</span>
+            <span class="kw">InVisualColour</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">r</span><span class="ot">=</span><span class="dv">0</span><span class="ot">,</span> <span class="kw">g</span><span class="ot">=</span><span class="dv">1</span><span class="ot">,</span> <span class="kw">b</span><span class="ot">=</span><span class="dv">1</span><span class="ot">,</span> <span class="kw">a</span><span class="ot">=</span><span class="dv">1</span><span class="ot">};</span>
+        <span class="ot">};</span>
+        
+        Import<span class="ot">(</span><span class="fu">assert</span><span class="ot">(</span>RelToData <span class="st">&quot;FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/SimpleEntityOfTutorial2.lua&quot;</span><span class="ot">))</span>
+        <span class="ot">{</span>           
+            <span class="kw">InName</span> <span class="ot">=</span> <span class="st">&quot;My Third Imported Entity&quot;</span><span class="ot">;</span>
+            <span class="kw">InPhysicsEnableDebugDrawing</span> <span class="ot">=</span> <span class="kw">true</span><span class="ot">;</span>
+            <span class="kw">InPosition</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">x</span><span class="ot">=-</span><span class="dv">110</span><span class="ot">;</span><span class="kw">y</span><span class="ot">=</span><span class="dv">50</span><span class="ot">;</span><span class="kw">z</span><span class="ot">=</span><span class="dv">10</span><span class="ot">;};</span>
+            <span class="kw">InOrientation</span> <span class="ot">=</span> QuaternionToTable<span class="ot">(</span> OrientFromYPRd<span class="ot">(</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> DEG_TO_RAD<span class="ot">(</span><span class="dv">30</span><span class="ot">))</span> <span class="ot">);</span>
+            <span class="kw">InVisualColour</span> <span class="ot">=</span> <span class="ot">{</span><span class="kw">r</span><span class="ot">=</span><span class="dv">1</span><span class="ot">,</span> <span class="kw">g</span><span class="ot">=</span><span class="dv">0</span><span class="ot">,</span> <span class="kw">b</span><span class="ot">=</span><span class="dv">1</span><span class="ot">,</span> <span class="kw">a</span><span class="ot">=</span><span class="dv">0.5</span><span class="ot">};</span>
+        <span class="ot">};</span>
+    <span class="ot">};</span>
+<span class="ot">}</span></code></pre>
+</div>
+<div class="section titleslide slide level1" id="the-end"><h1>The End</h1></div>
 </body>
 </html>

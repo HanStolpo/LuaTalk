@@ -19,7 +19,63 @@ What is Lua
 * Its is portable and minimalist
 	* Portable ANSI C
 	* Does not come with batteries
-	* Can squeeze runtime and standard libraries into approximately 98 KB 
+	* Can squeeze runtime and standard libraries into approximately 98 KB (usually 182K to 243K)
+
+Where did come from where is it used
+---------------------------------------
+* Tecgraf group at PUC-Rio Brazil
+* Lua means moon in Portugese
+* Used a lot in gaming (World of Warcaft, Angry Birds)
+* Used to add scripting to applications (SciTE, WireShark, Awesome)
+* Full blown systems 
+    * Premake - cross platform building
+    * Sputnik - web content management system
+* Embedded systems through eLua
+    * Targets running directly on microcontroller
+    * eLuaBrain - eLua based full dev environment on MCU
+* Mobile - Supported on iOS and Android
+
+What flavours are there
+---------------------------------------
+Lua 5.1.x 
+:   Most widely used standard Lua distribution
+:   Supports any system that can compile ANSI C
+Lua 5.2.x
+:    The newest Lua. 
+:    Not that widely supported yet.
+:    Supports any system that can compile ANSI C
+LuaJit
+:   Blindingly fast just in time compiler that is Lua 5.1.x compatible.
+:   Supports dynamic FFI to _C_ shared libraries
+:   
+    Supported OS
+
+    * Linux
+    * Android
+    * BSD
+    * OSX
+    * iOS
+    * Windows
+
+:   
+    Supported CPU
+
+    * x86 32 bit 64 bit
+    * ARMv5+, ARM9E+
+    * PPC/e500v2
+    * MIPS
+
+How to get it
+------------------------------------------------------
+* Get the source and compile into your application
+    * <http://www.lua.org/versions.html>
+    * <http://luajit.org/download.html>
+* Use LuaRocks <http://luarocks.org/>
+    * Deployment and management system for Lua modules
+* Use LuaDist <http://luadist.org/>
+    * Deployment and management system for Lua modules
+* Install Lua for Windows <https://code.google.com/p/luaforwindows/>
+    * Batteries included installation.
 
 The Language 
 ========================================
@@ -437,7 +493,7 @@ Extensibility (Meta table)
     * Key lookup and new key insertion : `__index` and `__newindex`
     * Function call (using object as a function): `__call`
     * Finalizers : `__gc` must be set from _C_
-* Meta tables used 
+* The meta table mechanism is used to extend _Lua_ semantically as needed.
 
 Metatable example
 --------------------------------------
@@ -479,3 +535,269 @@ local f4 = (f3 + f2 - f1)
 -- The 95th fibonacci is 3.194043463499e+019
 print ("The " .. f4.n .. "nth fibonacci number is " .. f4())
 ```
+
+Addons
+============================================
+
+IUP
+--------------------------------------------
+> * Cross platform native GUI toolkit.
+> * Supports declerative way of GUI definition.
+
+![IUP Dialog](IupDialog.png)
+
+```lua
+require "iuplua"
+require "iupluacontrols"
+local label
+local text = ""
+local function onText(self)
+	text = string.upper(self.value)
+end
+local function modifyLabel(self)
+	if label then 
+		label.title = text
+	end
+end
+
+dlg = iup.dialog
+{
+	iup.vbox
+	{
+		iup.label{title = 'A silly little dialog', map_cb = function(self) label = self end},
+		iup.vbox
+			{
+				iup.hbox
+				{
+					iup.label{title='Write text', size="80"},
+					iup.text{size="80", valuechanged_cb = onText}
+					;margin="0", gap="10"
+				};
+				iup.hbox
+				{
+					iup.button{title="Ok",size="40", action = modifyLabel},
+					iup.button{title="Cancel",size="40" , action = function () return iup.CLOSE end}
+					;margin="0", gap="10"
+				};	
+			}
+		;margin="5x5", gap="5"
+	}
+	;title="Some dialog", resize="NO"
+}
+dlg:popup()
+```
+
+Cosmo
+--------------------------------------------
+> * Cosmo is a “safe templates” engine.
+> * It allows you to fill nested templates.
+> * Many of the advantages of Turing-complete template engines, 
+    without without the downside of allowing arbitrary code in the templates.
+
+```lua
+local cosmo = require "cosmo"
+mycards = { {rank="Ace", suit="Spades"}
+		  , {rank="Queen", suit="Diamonds"}
+		  , {rank="10", suit="Hearts"} 
+		  } 
+template = "$do_cards[[$rank of $suit, ]]"
+-- prints Ace of Spades, Queen of Diamonds, 10 of Hearts,
+print (cosmo.fill(template, {do_cards = mycards}))
+```
+
+Penlight 
+--------------------------------------------
+> * Your batteries for general development
+> * Adds support for functional style
+
+```lua
+local List = require 'pl.List'	
+local func = require 'pl.func'	
+print (List{10,20,30}:map(_1+1):reduce '+')	-- prints 63
+```
+
+> * Standard class system using meta tables
+
+```lua
+ class = require 'pl.class'
+
+ class.Animal()
+ function Animal:_init(name)
+     self.name = name
+ end
+ function Animal:__tostring()
+   return self.name..': '..self:speak()
+ end
+
+ class.Dog(Animal)
+ function Dog:speak()
+   return 'bark'
+ end
+
+ class.Cat(Animal)
+ function Cat:_init(name,breed)
+     self:super(name)  -- must init base!
+     self.breed = breed
+ end
+ function Cat:speak()
+   return 'meow'
+ end
+
+fido = Dog('Fido')
+felix = Cat('Felix','Tabby')
+
+print(fido,felix)        -- Fido: bark Felix: meow
+print(felix:is_a(Animal) -- true
+print(felix:is_a(Dog))   -- false
+print(felix:is_a(Cat))   -- true
+```
+
+MetaLua
+----------------------------------------------
+> * Static meta programming system for Lua
+> * Alter compilation process in arbitrary, powerful and maintainable ways
+> * Comes with some useful extensions built in
+>    * Pattern matching like in Haskell an ML
+>    * list comprehension
+
+```lua
+-{extension "clist"}
+
+-- integers from 2 to 50, by steps of 2:
+x = { i for i = 2, 50, 2 }
+
+-- the same, obtained by filtering over all integers <= 50:
+y = { i for i = 1, 50 if i%2==0 }
+
+
+-{extension 'match'}
+
+match { { 'o', 'k', '!' } } with
+| { t } -> match t with
+   | { a, b }      -> print 'KO'
+   | { a, b, ... } -> print (a..b)
+   | _             -> print 'KO'
+   end
+| _ -> print 'KO'
+end
+```
+
+How do we use it
+==================================
+
+Build Automation
+-----------------------------------
+* Scripts to pull repository version info into builds
+* Scripts to generate project skeletons
+* Scripts to generate code
+
+Data definition language
+-----------------------------------
+> * Instead of writing a compiler
+> * We defined a DSL based on _Lua_ tables
+> * Use _Lua_ as the compiler
+> * Generate _C++_ code
+
+```lua
+FLiDataCompiler
+{INCLUDE_PCH = [[#include "fliModelsPCH.h"]];
+ INCLUDE_LIB = [[#include "../fliModelsLib.h"]];
+ EXPORT_DECL = [[fliMODELS_API]];
+ INCLUDES = {"dmlGoalState.dsd", "dmlGoalChildrenConstraint.dsd", "dmlTrigger.dmd"};
+ [[	@brief	Goals are a hierarchical way to define what an entity is required to achieve. 
+ ]];
+ MODEL = {"fli::act::DGoal";
+ 	[[@brief String used to categorize the goal with categories seperated by / also used to identify the goal]];
+ 	{"Category", {"string", 1}};
+ 
+ 	[[@brief The current active state of the goal]];
+ 	{"State", {"EGoalState", 2, default='GOAL_INACTIVE'}};
+ 
+ 	[[@brief Constrain how the goal's children become active when it is active]];
+ 	{"ChildrenConstraint", {"EGoalChildrenConstraint", 3, default="GOAL_CHILDREN_ACTIVE_CONCURRENTLY"}};
+
+ 	[[@brief Child goals]];
+ 	{"Children", {"array<DGoal>", 4}};
+
+ 	...
+ 	...
+
+ 	[[@brief The number of times the goal has passed]];
+ 	{"PassedCount", {"int32", 9, set=false}};
+
+	[[@brief The number of times the goal has failed]];
+	{"FailedCount", {"int32", 10, set=false}};
+
+ };
+};
+```
+
+Data description language
+--------------------------------------
+> * We have component hierarchies which can be serialized as XML, binary etc.
+> * XML is not human write friendly
+> * We use _Lua_'s tables to declaritively build the hierarchies
+> * This is more succint
+> * This is more flexible
+> * Still have full power of _Lua_ where needed
+
+```lua
+fli_data.ScopeModelCreate()
+local DoNotRegister = true	-- Do not register with fli::data::CManager
+
+-----------------------------------------------------
+-- Scenario world
+-----------------------------------------------------
+-- Define the whole world for the scenario defining which extensions the world has as well as all the entities which are
+-- present in the world. 
+return Root(fli__ent__DWorld("World"), DoNotRegister)
+{
+	Extensions =
+	{
+		-- Extension that defines information related to the scenario but not a specific entity
+		fli__ent__DScenarioInfo
+		{
+			Name = "Tutorial_03_SimpleVehicle";		
+			FocusEntity = RefModel("World:Entities.1");
+		};
+	};
+	
+	Entities = 
+	{
+		Import(assert(RelToData "FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/Terrain.lua"))
+		{			
+			InInitialTimeOfDay = 16 * 60 * 60;
+		};
+	
+		Import(assert(RelToData "FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/SimpleEntityOfTutorial2.lua"))
+		{			
+			InName = "My Imported Entity";
+			InPhysicsEnableDebugDrawing = true;
+			InPosition = {x=-100;y=50;z=0;};
+			InOrientation = QuaternionToTable( OrientFromYPRd(0, 0, 0) );
+			InVisualColour = {r=0, g=1, b=0, a=1};
+		};
+		
+		Import(assert(RelToData "FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/SimpleEntityOfTutorial2.lua"))
+		{			
+			InName = "My Second Imported Entity";
+			InPhysicsEnableDebugDrawing = true;
+			InPosition = {x=-100;y=50;z=10;};
+			InOrientation = QuaternionToTable( OrientFromYPRd(DEG_TO_RAD(60), 0, 0) );
+			InVisualColour = {r=0, g=1, b=1, a=1};
+		};
+		
+		Import(assert(RelToData "FLiTutorials/Tutorial_03_SimpleVehicle/Scripts/SimpleEntityOfTutorial2.lua"))
+		{			
+			InName = "My Third Imported Entity";
+			InPhysicsEnableDebugDrawing = true;
+			InPosition = {x=-110;y=50;z=10;};
+			InOrientation = QuaternionToTable( OrientFromYPRd(0, 0, DEG_TO_RAD(30)) );
+			InVisualColour = {r=1, g=0, b=1, a=0.5};
+		};
+	};
+}
+```
+
+The End
+==================================

@@ -1,4 +1,17 @@
 
+--require "metalua"
+--dofile "match_test.mlua"
+
+local cosmo = require "cosmo"
+mycards = { {rank="Ace", suit="Spades"}
+		  , {rank="Queen", suit="Diamonds"}
+		  , {rank="10", suit="Hearts"} 
+		  } 
+template = "$do_cards[[$rank of $suit, ]]"
+-- prints Ace of Spades, Queen of Diamonds, 10 of Hearts,
+print (cosmo.fill(template, {do_cards = mycards}))
+
+
 local mtFibber = {}
 function makeFibber(n)
     local f = {n = n}
@@ -46,36 +59,81 @@ print ("The " .. f4.n .. "nth fibonacci number is " .. f4())
     -- no stack overflow
     local c = fib(10000)
 	print (c)
+
+local List = require 'pl.List'	
+local func = require 'pl.func'	
+print (List{10,20,30}:map(_1+1):reduce '+')	-- prints 63
+
+
+class = require 'pl.class'
+
+class.Animal()
+
+function Animal:_init(name)
+    self.name = name
+end
+
+function Animal:__tostring()
+  return self.name..': '..self:speak()
+end
+
+class.Dog(Animal)
+
+function Dog:speak()
+  return 'bark'
+end
+
+class.Cat(Animal)
+
+function Cat:_init(name,breed)
+    self:super(name)  -- must init base!
+    self.breed = breed
+end
+
+function Cat:speak()
+  return 'meow'
+end
+
+fido = Dog('Fido')
+felix = Cat('Felix','Tabby')
+
+print(fido,felix)        -- Fido: bark      Felix: meow     Leo: roar
+print(felix:is_a(Animal))-- true
+print(felix:is_a(Dog))   -- false
+print(felix:is_a(Cat))   -- true
+
 	
 
 require "iuplua"
 require "iupluacontrols"
+local label
 local text = ""
-local function filterText()
+local function onText(self)
+	text = string.upper(self.value)
 end
+local function modifyLabel(self)
+	if label then 
+		label.title = text
+	end
+end
+
 dlg = iup.dialog
 {
 	iup.vbox
 	{
-		iup.label{title = 'A silly little dialog'},
+		iup.label{title = 'A silly little dialog', map_cb = function(self) label = self end},
 		iup.vbox
 			{
 				iup.hbox
 				{
 					iup.label{title='Write text', size="80"},
-					iup.text{size="80", action = filterText}
+					iup.text{size="80", valuechanged_cb = onText}
 					;margin="0", gap="10"
 				};
 				iup.hbox
 				{
-					iup.label{title='name space', size="80"},
-					iup.text{size="80", action = filter_name_space}
-					;margin="0", gap="10"
-				};
-				iup.hbox
-				{
-					iup.button{title="Ok",size="40", action = on_ok},
-					iup.button{title="Cancel",size="40" , action = on_cancel}
+					iup.button{title="Ok",size="40", action = modifyLabel},
+					iup.button{title="Cancel",size="40" , action = function () return iup.CLOSE end}
 					;margin="0", gap="10"
 				};	
 			}
